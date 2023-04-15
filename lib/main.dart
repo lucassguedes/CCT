@@ -1,3 +1,4 @@
+import "dart:developer";
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -134,7 +135,40 @@ class _CommonEmissorState extends State<CommonEmitter>{
   double vcc = 15;
   double vbb = 15;
 
-  String treat_number(double number)
+  final TextEditingController rc_controller = TextEditingController();
+  final TextEditingController rb_controller = TextEditingController();
+  final TextEditingController vbb_controller = TextEditingController();
+  final TextEditingController vcc_controller = TextEditingController();
+
+
+
+  @override
+  void dispose(){
+    rc_controller.dispose();
+    rb_controller.dispose();
+    vbb_controller.dispose();
+    vcc_controller.dispose();
+    super.dispose();
+  }
+
+
+  double hfe = 100;
+
+  double calculate_ib()
+  {
+    return (vbb - 0.7)/rb;
+  }
+
+  double calculate_ic(double ib)
+  {
+    return ib*hfe;
+  }
+
+  double calculate_vc(double ic){
+    return vcc - ic*rc;
+  }
+
+  String treat_number(double number, {int precision = 1})
   {
     String dimension;
     double reduced_number;
@@ -142,7 +176,18 @@ class _CommonEmissorState extends State<CommonEmitter>{
     reduced_number = number;
     dimension = "";
 
-    if(number > 1000 && number < 1000000)
+    
+    if(number <= 0.00001)
+    {
+      reduced_number = number * 1000000;
+      dimension = "μ";
+    }
+    else if(number <= 0.1)
+    {
+      reduced_number = number * 1000;
+      dimension = "m";
+    }
+    else if(number > 1000 && number < 1000000)
     {
       reduced_number = number / 1000.0;
       dimension = "k";
@@ -152,7 +197,7 @@ class _CommonEmissorState extends State<CommonEmitter>{
       dimension = "M";
     }
 
-    return "$reduced_number $dimension";
+    return "${reduced_number.toStringAsFixed(precision)} $dimension";
   }
 
   Widget build(BuildContext context)
@@ -167,15 +212,222 @@ class _CommonEmissorState extends State<CommonEmitter>{
       child: Stack(
         children: [
           Positioned(
-              top: 230,
-              left: 200,
-              child: Text("RC = ${treat_number(rc)} Ω")
+              top: 210,
+              left: 180,
+              child: TextButton(
+                onPressed: () => showDialog(
+                    context: context,
+                    builder: (BuildContext context) => Dialog(
+                      child: Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Padding(
+                              padding: EdgeInsets.all(15.0),
+                              child: Text('Valor do resistor do coletor (Ω).'),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: rc_controller,
+                                  decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
+                                      hintText: "$rc"
+                                  ),
+                                ),
+                            ),
+                            TextButton(
+
+                                onPressed: (){
+                                  setState(() {
+                                    if(rc_controller.text != '')
+                                    {
+                                      rc = double.parse(rc_controller.text);
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Confirmar')
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                ),
+                child: Text("RC = ${treat_number(rc)} Ω"),
+              )
           ),
           Positioned(
-              top: 270,
+              top: 250,
               left: 50,
-              child: Text("RB = ${treat_number(rb)} Ω")
-          )
+              child: TextButton(
+                onPressed: () => showDialog(
+                    context: context,
+                    builder: (BuildContext context) => Dialog(
+                      child: Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Padding(
+                              padding: EdgeInsets.all(15),
+                              child: Text('Valor do resistor da base (Ω).'),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.all(15.0),
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: rb_controller,
+                                  decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
+                                      hintText: "$rb"
+                                  ),
+                                ),
+                            ),
+                            const SizedBox(height: 15),
+                            TextButton(
+                                onPressed: (){
+                                  setState(() {
+                                    if(rb_controller.text != '')
+                                    {
+                                      rb = double.parse(rb_controller.text);
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Confirmar')
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                ),
+                child: Text("RB = ${treat_number(rb)} Ω"),
+              )
+          ),
+          Positioned(
+              top: 0,
+              left: 10,
+              child: TextButton(
+                onPressed: () => showDialog(
+                    context: context,
+                    builder: (BuildContext context) => Dialog(
+                      child: Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Padding(
+                              padding: EdgeInsets.all(15.0),
+                              child: Text('Valor da tensão na base (V).'),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: TextField(
+                                keyboardType: TextInputType.number,
+                                controller: vbb_controller,
+                                decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    hintText: "$vbb"
+                                ),
+                              ),
+                            ),
+                            TextButton(
+
+                                onPressed: (){
+                                  setState(() {
+                                    if(vbb_controller.text != '')
+                                    {
+                                      vbb = double.parse(vbb_controller.text);
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Confirmar')
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                ),
+                child: Text("VBB = ${treat_number(vbb)}V"),
+              ),
+
+          ),
+          Positioned(
+            top: 20,
+            left: 10,
+            child: TextButton(
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context) => Dialog(
+                    child: Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Text('Valor da tensão de alimentação (V).'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: TextField(
+                              keyboardType: TextInputType.number,
+                              controller: vcc_controller,
+                              decoration: InputDecoration(
+                                  border: const OutlineInputBorder(),
+                                  hintText: "$vcc"
+                              ),
+                            ),
+                          ),
+                          TextButton(
+
+                              onPressed: (){
+                                setState(() {
+                                  if(vcc_controller.text != '')
+                                  {
+                                    vcc = double.parse(vcc_controller.text);
+                                  }
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Confirmar')
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+              ),
+              child: Text("VCC = ${treat_number(vcc)}V"),
+            ),
+          ),
+          const Positioned(
+            top: 80,
+            left: 20,
+            child: Text("Dados calculados:"),
+          ),
+          Positioned(
+            top: 120,
+            left: 20,
+            child: Text("Vc = ${calculate_vc(calculate_ic(calculate_ib())).toStringAsFixed(2)}V"),
+          ),
+          Positioned(
+            top: 140,
+            left: 20,
+            child: Text("Ic = ${treat_number(calculate_ic(calculate_ib()), precision: 2)}A"),
+          ),
+          Positioned(
+            top: 160,
+            left: 20,
+            child: Text("Ib = ${treat_number(calculate_ib(), precision: 2)}A"),
+          ),
         ],
       ),
     );
