@@ -355,7 +355,7 @@ class _CommonEmissorState extends State<CommonEmitter>{
                       ),
                     )
                 ),
-                child: Text("VBB = ${treat_number(vbb)}V"),
+                child: Text("VBE = VBB = ${treat_number(vbb)}V"),
               ),
 
           ),
@@ -416,17 +416,17 @@ class _CommonEmissorState extends State<CommonEmitter>{
           Positioned(
             top: 120,
             left: 20,
-            child: Text("Vc = ${calculate_vc(calculate_ic(calculate_ib())).toStringAsFixed(2)}V"),
+            child: Text("VEC = VC = ${calculate_vc(calculate_ic(calculate_ib())).toStringAsFixed(2)}V"),
           ),
           Positioned(
             top: 140,
             left: 20,
-            child: Text("Ic = ${treat_number(calculate_ic(calculate_ib()), precision: 2)}A"),
+            child: Text("IC = ${treat_number(calculate_ic(calculate_ib()), precision: 2)}A"),
           ),
           Positioned(
             top: 160,
             left: 20,
-            child: Text("Ib = ${treat_number(calculate_ib(), precision: 2)}A"),
+            child: Text("IB = ${treat_number(calculate_ib(), precision: 2)}A"),
           ),
         ],
       ),
