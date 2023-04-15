@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     Text(
-      'Index 0: Home',
+      'Index 0: Circuitaria',
       style: optionStyle,
     ),
     Text(
@@ -80,6 +80,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     Widget page;
 
+    switch(selectedIndex)
+    {
+      case 0:
+        page = CommonEmitter();
+      break;
+      default:
+        page = Center();
+    }
+
 
     return LayoutBuilder(builder: (context, constraints){
       return Scaffold(
@@ -87,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: const Text("Calc. de Circuitos Transistorizados"),
         ),
         body: Center(
-          child: _widgetOptions.elementAt(selectedIndex),
+          child: page,
         ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
@@ -113,12 +122,62 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class CircuitArea extends StatelessWidget{
-  const CircuitArea({super.key});
+class CommonEmitter extends StatefulWidget{
+  CommonEmitter({super.key});
 
-  @override
-  Widget build(BuildContext context){
-    return Center(
+  State<CommonEmitter> createState() => _CommonEmissorState();
+}
+
+class _CommonEmissorState extends State<CommonEmitter>{
+  double rb = 2000000;
+  double rc = 3600;
+  double vcc = 15;
+  double vbb = 15;
+
+  String treat_number(double number)
+  {
+    String dimension;
+    double reduced_number;
+
+    reduced_number = number;
+    dimension = "";
+
+    if(number > 1000 && number < 1000000)
+    {
+      reduced_number = number / 1000.0;
+      dimension = "k";
+    }else if(number > 1000000)
+    {
+      reduced_number = number / 1000000.0;
+      dimension = "M";
+    }
+
+    return "$reduced_number $dimension";
+  }
+
+  Widget build(BuildContext context)
+  {
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage('assets/circuito_ec.png'),
+            fit: BoxFit.contain
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+              top: 230,
+              left: 200,
+              child: Text("RC = ${treat_number(rc)} Ω")
+          ),
+          Positioned(
+              top: 270,
+              left: 50,
+              child: Text("RB = ${treat_number(rb)} Ω")
+          )
+        ],
+      ),
     );
   }
 }
