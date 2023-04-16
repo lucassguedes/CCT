@@ -16,6 +16,7 @@ class _CommonEmitterState extends State<CommonEmitter>{
   final TextEditingController rb_controller = TextEditingController();
   final TextEditingController vbb_controller = TextEditingController();
   final TextEditingController vcc_controller = TextEditingController();
+  final TextEditingController hfe_controller = TextEditingController();
 
 
 
@@ -25,6 +26,7 @@ class _CommonEmitterState extends State<CommonEmitter>{
     rb_controller.dispose();
     vbb_controller.dispose();
     vcc_controller.dispose();
+    hfe_controller.dispose();
     super.dispose();
   }
 
@@ -283,6 +285,55 @@ class _CommonEmitterState extends State<CommonEmitter>{
                   )
               ),
               child: Text("VCC = ${treat_number(vcc)}V"),
+            ),
+          ),
+          Positioned(
+            top: 40,
+            left: 10,
+            child: TextButton(
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context) => Dialog(
+                    child: Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Text('Ganho:'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: TextField(
+                              keyboardType: TextInputType.number,
+                              controller: hfe_controller,
+                              decoration: InputDecoration(
+                                  border: const OutlineInputBorder(),
+                                  hintText: "$hfe"
+                              ),
+                            ),
+                          ),
+                          TextButton(
+
+                              onPressed: (){
+                                setState(() {
+                                  if(hfe_controller.text != '')
+                                  {
+                                    hfe = double.parse(hfe_controller.text);
+                                  }
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Confirmar')
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+              ),
+              child: Text("β = ${treat_number(hfe)}"),
             ),
           ),
           const Positioned(
