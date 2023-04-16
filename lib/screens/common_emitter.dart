@@ -1,4 +1,6 @@
 import "package:flutter/material.dart";
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 
 class CommonEmitter extends StatefulWidget{
   CommonEmitter({super.key});
@@ -11,6 +13,8 @@ class _CommonEmitterState extends State<CommonEmitter>{
   double rc = 3600;
   double vcc = 15;
   double vbb = 15;
+
+  List<TransistorCurvePoint> chartData = [];
 
   final TextEditingController rc_controller = TextEditingController();
   final TextEditingController rb_controller = TextEditingController();
@@ -78,6 +82,28 @@ class _CommonEmitterState extends State<CommonEmitter>{
 
     return "${reduced_number.toStringAsFixed(precision)} $dimension";
   }
+
+  List<TransistorCurvePoint> getChartData()
+  {
+    List<TransistorCurvePoint> chartData = [];
+    const double vceMax = 40;
+    double currentIc = 0;
+    for(double i = 0; i < vceMax; i+=0.1)
+    {
+      if(i <= 0.7)
+      {
+        currentIc = ((i)/rc)*1000;
+      }else if(i >= vceMax - 0.1)
+      {
+        currentIc = currentIc*3;
+      }
+
+      chartData.add(TransistorCurvePoint(currentIc, i.toDouble()));
+    }
+
+    return chartData;
+  }
+
 
   Widget build(BuildContext context)
   {
@@ -356,8 +382,70 @@ class _CommonEmitterState extends State<CommonEmitter>{
             left: 20,
             child: Text("IB = ${treat_number(calculate_ib(), precision: 2)}A"),
           ),
+          Positioned(
+              top: 500,
+              left: 120,
+              child: ElevatedButton(
+                child: Text("Mostrar Curva"),
+                onPressed: (){
+                  chartData = getChartData();
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) => Dialog(
+                        child: Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: SafeArea(
+                              child: Container(
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                        child: SfCartesianChart(
+                                          title: ChartTitle(text: 'Curva ICxVCE'),
+                                          legend: Legend(isVisible: true),
+                                          series: <ChartSeries>[
+                                          LineSeries<TransistorCurvePoint, double>(
+                                            name: 'Corrente do coletor',
+                                            dataSource: chartData,
+                                            xValueMapper: (TransistorCurvePoint point, _) => point.vec,
+                                            yValueMapper: (TransistorCurvePoint point, _) => point.ic,
+                                            // dataLabelSettings: const DataLabelSettings(isVisible: true),
+                                          )
+                                        ],
+                                          primaryXAxis: NumericAxis(
+                                              labelFormat: "{value}V",
+                                              edgeLabelPlacement: EdgeLabelPlacement.shift
+                                          ),
+                                          primaryYAxis: NumericAxis(
+                                              labelFormat: "{value}A"
+                                          ),
+                                        )
+                                    ),
+                                    ElevatedButton(
+                                        onPressed: (){
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Fechar")
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                        ),
+                      )
+                  );
+                },
+
+              )
+          )
         ],
       ),
     );
   }
+}
+
+class TransistorCurvePoint{
+  TransistorCurvePoint(this.ic, this.vec);
+
+  double ic;
+  double vec;
 }
