@@ -104,6 +104,21 @@ class _CommonEmitterState extends State<CommonEmitter>{
     return chartData;
   }
 
+  String getRegion()
+  {
+    double vce = vcc - calculate_ic(calculate_ib())*rc;
+    if(vce < 0)
+    {
+      return "Ruptura";
+    }else if(vce < 0.7)
+    {
+      return "Saturação";
+    }else{
+      return "Ativa";
+    }
+  }
+
+
 
   Widget build(BuildContext context)
   {
@@ -416,7 +431,7 @@ class _CommonEmitterState extends State<CommonEmitter>{
                                               edgeLabelPlacement: EdgeLabelPlacement.shift
                                           ),
                                           primaryYAxis: NumericAxis(
-                                              labelFormat: "{value}A"
+                                              labelFormat: "{value}mA"
                                           ),
                                         )
                                     ),
@@ -436,6 +451,11 @@ class _CommonEmitterState extends State<CommonEmitter>{
                 },
 
               )
+          ),
+          Positioned(
+              top: 400,
+              left: 95,
+              child: Text("Região de operação: ${getRegion()}"),
           )
         ],
       ),
