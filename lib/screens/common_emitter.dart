@@ -86,7 +86,7 @@ class _CommonEmitterState extends State<CommonEmitter>{
   List<TransistorCurvePoint> getChartData()
   {
     List<TransistorCurvePoint> chartData = [];
-    const double vceMax = 40;
+    double vceMax = vcc;
     double currentIc = 0;
     for(double i = 0; i < vceMax; i+=0.1)
     {
