@@ -60,7 +60,7 @@ class _CommonEmitterState extends State<CommonEmitter>{
     dimension = "";
 
 
-    if(number <= 0.00001)
+    if(number <= 0.0001)
     {
       reduced_number = number * 1000000;
       dimension = "μ";

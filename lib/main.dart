@@ -105,3 +105,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+class CircuitSelector extends StatefulWidget{
+  const CircuitSelector({super.key});
+
+  State<CircuitSelector> createState() => CircuitSelectorState();
+}
+
+class CircuitSelectorState extends State<CircuitSelector>{
+
+  List<ElevatedButton> circuitButtons = [];
+  List<String> circuitNames = ["Emissor comum (IB fixa)", "Emissor comum (IC fixa)"];
+
+
+  Widget build(BuildContext context){
+    return Container(
+      child: Column(
+        children: [
+
+        ],
+      ),
+    );
+  }
+}
+
